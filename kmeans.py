@@ -23,6 +23,7 @@ def euclidean_distance(data, centroids):
 # Fungsi mendapatkan rasio eror
 # kembalikan rasio eror terkecil
 def error_ratio(clusters, labels):
+    clus = deepcopy(clusters)
     max_label = np.max(np.unique(labels))
     num_of_labels = len(np.unique(labels))
     error = []
@@ -32,11 +33,11 @@ def error_ratio(clusters, labels):
     for l in range(num_of_labels):
         miss = 0
         if l > 0:
-            clusters += 1
-            clusters[clusters>max_label] = 0
+            clus += 1
+            clus[clus>max_label] = 0
 
-        for x in range(len(clusters)):
-            if clusters[x] != labels[x]:
+        for x in range(len(clus)):
+            if clus[x] != labels[x]:
                 miss += 1
 
         error.append((miss / len(labels)) * 100)
@@ -54,7 +55,7 @@ def cluster_variance(data, clusters, k):
     # kelompokkan data tiap cluster
     for x in range(k):
         n.append([data[i] for i in range(len(data)) if clusters[i] == x])
-    
+
     # hitung variance tiap cluster
     for x in range(k):
         d = n[x]    # data pada cluster x
@@ -69,8 +70,8 @@ def cluster_variance(data, clusters, k):
         # simpan variance tiap cluster
         var.append((1/(len(n[x]) - 1)) * sum_of_d)
 
-    print("VAR")
-    print(var)
+    # print("VAR")
+    # print(var)
 
     # within variance
     sum_of_vw = 0   # sigma perhitungan data variance within
@@ -81,8 +82,8 @@ def cluster_variance(data, clusters, k):
     # simpan variance within (vw)
     vw = (1/(len(data) - 1)) * sum_of_vw
     
-    print("VW")
-    print(vw.item())
+    # print("VW")
+    # print(vw.item())
 
     # between variance
     sum_of_vb = 0
@@ -98,8 +99,8 @@ def cluster_variance(data, clusters, k):
     # simpan variance between (vb)
     vb = (1/(k - 1)) * sum_of_vb
 
-    print("VB")
-    print(vb.item())
+    # print("VB")
+    # print(vb.item())
 
     # Hitung total variance
     v = vw / vb
@@ -142,9 +143,6 @@ def main():
         # dapatkan tiap cluster data
         clusters = np.argmin(D, axis=1)
 
-        print("Clusters")
-        print("=========================")
-        print(clusters, "\n")
 
         # salin centroid ke centroid lama
         old_C = deepcopy(C)
@@ -152,6 +150,8 @@ def main():
         # hitung ulang centroid baru dengan menghitung rata-rata dari data tiap cluster
         for i in range(k):
             points = [data[j] for j in range(len(data)) if clusters[j] == i]
+
+
             # jika ada cluster yang kosong maka lanjutkan proses karena menghasilkan NaN jika diteruskan
             if len(points) == 0:
                 continue
@@ -161,6 +161,9 @@ def main():
         print("=========================")
         print(C, "\n")
         
+        print("Clusters")
+        print("=========================")
+        print(clusters, "\n")
         # jika sudah konvergen maka hentikan perulangan
         if np.array_equal(C, old_C):
             break
@@ -169,6 +172,12 @@ def main():
     print("Labels")
     print("=========================")
     print(labels, "\n")
+
+    print("Clusters")
+    print("=========================")
+    print(clusters, "\n")
+
+    print("====================================================================================================")
 
     # Hitung Error Ratio
     error = error_ratio(clusters, labels)
